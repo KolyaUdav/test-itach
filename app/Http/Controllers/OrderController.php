@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\OrderRequest;
 use App\Models\Order;
+use App\Services\API\PriceHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -22,8 +23,13 @@ class OrderController extends BaseController
         $data = $request->validated();
         $user = $request->user();
 
+        $prices = PriceHandler::getPrices();
+        $price = PriceHandler::getPriceByCode($data[Order::FIELD_FUEL_TYPE], $prices);
+
+        $data[Order::FIELD_COST_IN_TIME] = $price;
+
         $createdOrder = Order::createByTransaction($user, $data);
-        
+
         if (!$createdOrder) {
             $this->error($this->getErrorMessage('not_create'));
         }

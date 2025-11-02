@@ -52,13 +52,11 @@ class Order extends BaseModel
      */
     public static function fillOrderData(array $data, User $user): array
     {
-        $costInTime = 2;
-
         $quantity = $data[self::FIELD_QUANTITY];
+        $costInTime = $data[self::FIELD_COST_IN_TIME];
 
         $cost = $costInTime * $quantity;
 
-        $data[self::FIELD_COST_IN_TIME] = $costInTime;
         $data[self::FIELD_COST] = $cost;
         $data[self::FIELD_FUEL_NAME] = Fuels::from($data[self::FIELD_FUEL_TYPE])->getName();
         $data[self::FIELD_USER_ID] = $user->id;
