@@ -2,47 +2,57 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
+use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class User extends BaseModel
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
+    const FIELD_NAME = 'name';
+    const FIELD_EMAIL = 'email';
+    const FIELD_PASSWORD = 'password';
+    const FIELD_REMEMBER_TOKEN = 'remember_token';
+
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+        self::FIELD_NAME,
+        self::FIELD_EMAIL,
+        self::FIELD_PASSWORD,
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
-        'password',
-        'remember_token',
+        self::FIELD_PASSWORD,
+        self::FIELD_REMEMBER_TOKEN,
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
+    public static function getUser(string $email): ?self
+    {
+        return User::where(User::FIELD_EMAIL, $email)->first();
+    }
+
+    public function getNewToken(): string
+    {
+        return $this->createToken('api-token')->plainTextToken;
+    }
+
+    public function checkPassword(string $password): bool
+    {
+        $currentPass = $this->{self::FIELD_PASSWORD};
+
+        return Hash::check($password, $currentPass);
+    }
+
+    public function deleteToken(): void
+    {
+        $this->tokens()->delete();
+    }
+
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            self::FIELD_PASSWORD => 'hashed',
         ];
     }
 }
