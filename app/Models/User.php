@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Roles\Entities;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
@@ -14,22 +15,17 @@ class User extends BaseModel
     const FIELD_NAME = 'name';
     const FIELD_EMAIL = 'email';
     const FIELD_PASSWORD = 'password';
-    const FIELD_REMEMBER_TOKEN = 'remember_token';
+    const FIELD_ROLE_ID = 'role_id';    
 
-    protected $fillable = [
-        self::FIELD_NAME,
-        self::FIELD_EMAIL,
-        self::FIELD_PASSWORD,
-    ];
+    protected $guarded = ['id'];
 
     protected $hidden = [
         self::FIELD_PASSWORD,
-        self::FIELD_REMEMBER_TOKEN,
     ];
 
     public static function getUser(string $email): ?self
     {
-        return User::where(User::FIELD_EMAIL, $email)->first();
+        return self::where(self::FIELD_EMAIL, $email)->first();
     }
 
     public function getNewToken(): string
@@ -47,6 +43,24 @@ class User extends BaseModel
     public function deleteToken(): void
     {
         $this->tokens()->delete();
+    }
+
+    /**
+     * Получит роль из реестра зарегистрированных ролей
+     */
+    public function getRole(): ?Entities
+    {
+        try {
+            $roleId = (int)$this->{self::FIELD_ROLE_ID};
+
+            if ($roleId === 0) {
+                return null;
+            }
+
+            return Entities::from($roleId);
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     protected function casts(): array

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\Roles\Entities;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -17,6 +18,7 @@ class UserSeeder extends Seeder
             'name' => 'Valerka',
             'email' => 'valerka@example.com',
             'password' => Hash::make('ValErka1_'),
+            'role_id' => Entities::Admin->value,
         ]);
     }
 }
