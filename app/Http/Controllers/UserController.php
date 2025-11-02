@@ -13,13 +13,10 @@ class UserController extends BaseController
     const DEFAULT_MESSAGE_ERROR = 'User Error';
     const DEFAULT_MESSAGE_SUCCESS = 'User Success';
 
-    protected $model = User::class;
+    const CONF_MSG_KEY_SUCCESS = 'user';
+    const CONF_MSG_KEY_ERROR = 'user';
 
-    public function __construct()
-    {
-        $this->errorMessages = config('errors.user');
-        $this->successMessages = config('successes.user');
-    }
+    protected $model = User::class;
 
     public function login(UserRequest $request): JsonResponse
     {

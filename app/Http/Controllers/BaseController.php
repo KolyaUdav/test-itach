@@ -3,11 +3,29 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class BaseController extends Controller
 {
+    /**
+     * Стандартное сообщение ошибки, если подходящего сообщения не найдено
+     */
     const DEFAULT_MESSAGE_ERROR = 'Error';
+
+    /**
+     * Стандартное сообщение успеха, если подходящего сообщения не найдено
+     */
     const DEFAULT_MESSAGE_SUCCESS = 'Success';
+
+    /**
+     * Постфикс конфига с сообщениями успехов
+     */
+    const CONF_MSG_KEY_SUCCESS = '';
+
+    /**
+     * Постфикс конфига с сообщениями ошибок
+     */
+    const CONF_MSG_KEY_ERROR = '';
 
     /**
      * @param class-string
@@ -23,6 +41,22 @@ class BaseController extends Controller
      * @param string[]
      */
     protected $successMessages = [];
+
+    public function __construct()
+    {
+        $this->registerMsgConfigs();
+    }
+
+    public function filter(Request $request): JsonResponse
+    {
+        if ($this->model) {
+            $elements = $this->model::filter($request);
+
+            return $this->success(['data' => $elements]);
+        }
+
+        return $this->error();
+    }
 
     public function getById(int $id): JsonResponse
     {
@@ -90,5 +124,23 @@ class BaseController extends Controller
         }
 
         return response()->json($data, $status);
+    }
+
+    /**
+     * Регистрирует конфиги с сообщениями успеха и ошибок
+     */
+    protected function registerMsgConfigs(): void
+    {
+        if (static::CONF_MSG_KEY_ERROR) {
+            $this->errorMessages = config('errors.' . static::CONF_MSG_KEY_ERROR, []);
+        } else {
+            $this->errorMessages = [];
+        }
+
+        if (static::CONF_MSG_KEY_SUCCESS) {
+            $this->successMessages = config('successes.' . static::CONF_MSG_KEY_SUCCESS, []);
+        } else {
+            $this->successMessages = [];
+        }
     }
 }

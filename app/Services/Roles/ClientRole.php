@@ -6,11 +6,11 @@ class ClientRole extends UserRole
 {
     public function canWatchLastOrder(): bool
     {
-        return false;
+        return true;
     }
 
     public function canCreateOrder(): bool
     {
-        return false;
+        return true;
     }
 }

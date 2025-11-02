@@ -22,11 +22,11 @@ class UserRequest extends FormRequest
             
             User::FIELD_EMAIL . '.required' => 'Email обязателен для заполнения',
             User::FIELD_EMAIL . '.string' => 'Email должен быть строкой',
-            User::FIELD_EMAIL . '.max:50' => 'Email не должен превышать 50 символов',
+            User::FIELD_EMAIL . '.max' => 'Email не должен превышать 50 символов',
             
             User::FIELD_PASSWORD . '.required' => 'Пароль обязателен для заполнения',
             User::FIELD_PASSWORD . '.string' => 'Пароль должен быть строкой',
-            User::FIELD_PASSWORD . '.max:25' => 'Пароль не должен превышать 25 символов',
+            User::FIELD_PASSWORD . '.max' => 'Пароль не должен превышать 25 символов',
         ];
     }
 }

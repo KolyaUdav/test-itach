@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Enums\Roles\Entities;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
@@ -15,7 +17,10 @@ class User extends BaseModel
     const FIELD_NAME = 'name';
     const FIELD_EMAIL = 'email';
     const FIELD_PASSWORD = 'password';
-    const FIELD_ROLE_ID = 'role_id';    
+    const FIELD_ROLE_ID = 'role_id';
+
+    const FIELD_BALANCE = 'balance';
+    const FIELD_ORDERS = 'orders';
 
     protected $guarded = ['id'];
 
@@ -61,6 +66,21 @@ class User extends BaseModel
         } catch (\Exception $e) {
             return null;
         }
+    }
+
+    public function getLastOrder(): ?Order
+    {
+        return $this->{self::FIELD_ORDERS}->last();
+    }
+
+    public function balance(): HasOne
+    {
+        return $this->hasOne(Balance::class, Balance::FIELD_USER_ID);
+    }
+
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class, Order::FIELD_USER_ID);
     }
 
     protected function casts(): array
