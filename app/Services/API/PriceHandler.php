@@ -5,11 +5,12 @@ namespace App\Services\API;
 use App\Models\Order;
 use Illuminate\Support\Facades\Http;
 
+/**
+ * Класс получения и обработки актуальных цен на топливо
+ */
 class PriceHandler
 {
-    const API_URL = 'https://dev2.a100.itach.by/api/v1/itach.azs/fuel/';
     const API_H_ACCEPT = 'application/json';
-    const API_H_TOKEN = '9739ab9d35b975d4643c5a7d19b5ec62';
 
     const BX_PARAMS_MAP = [
         'CODE' => Order::FIELD_FUEL_TYPE,
@@ -17,6 +18,9 @@ class PriceHandler
 
     ];
 
+    /**
+     * Получит весь перечень цен на топливо
+     */
     public static function getPrices(): array
     {
         $result = self::sendRequest();
@@ -25,6 +29,9 @@ class PriceHandler
         return $mappedResult;
     }
 
+    /**
+     * Получит цену на конкретное топливо по коду из \App\Enums\Fuels
+     */
     public static function getPriceByCode(string $code, array $mappedItems): float
     {
         $item = array_filter($mappedItems, fn ($mItem) => $mItem[Order::FIELD_FUEL_TYPE] === $code);
@@ -53,9 +60,9 @@ class PriceHandler
             ->withoutVerifying()
             ->withHeaders([
                 'Accept' => self::API_H_ACCEPT,
-                'BX-token' => self::API_H_TOKEN,
+                'BX-token' => config('price.token'),
             ])
-            ->get(self::API_URL);
+            ->get(config('price.url'));
         
         if ($response->ok()) {
             $result = @json_decode($response->body(), true);
